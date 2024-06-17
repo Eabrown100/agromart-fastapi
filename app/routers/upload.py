@@ -14,17 +14,17 @@ router = APIRouter(
 
 UPLOAD_DIRECTORY = "./uploads"
 
-@router.post("/produce/{produce_id}/image", response_model=dict)
-async def upload_produce_image(
-    produce_id: int,
+@router.post("/product/{product_id}/image", response_model=dict)
+async def upload_product_image(
+    product_id: int,
     file: UploadFile = File(...),
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(authentication.get_current_active_user),
 ):
-    produce = db.query(models.Produce).filter(models.Produce.id == produce_id, models.Produce.owner_id == current_user.id).first()
+    product = db.query(models.Product).filter(models.Product.id == product_id, models.Product.farmer_id == current_user.id).first()
 
-    if not produce:
-        raise HTTPException(status_code=404, detail="Produce not found or not owned by user")
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found or not owned by user")
 
     if not os.path.exists(UPLOAD_DIRECTORY):
         os.makedirs(UPLOAD_DIRECTORY)
@@ -36,11 +36,11 @@ async def upload_produce_image(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    produce.image_url = file_path
+    product.image_url = file_path
     db.commit()
-    db.refresh(produce)
+    db.refresh(product)
 
-    return {"image_url": produce.image_url}
+    return {"image_url": product.image_url}
 
 @router.post("/user/profile-picture", response_model=dict)
 async def upload_profile_picture(

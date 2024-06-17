@@ -1,3 +1,5 @@
+# app/models.py
+
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -27,7 +29,7 @@ class Product(Base):
     available_quantity = Column(Integer, nullable=False)
     farmer_id = Column(Integer, ForeignKey("users.id"))
     image_url = Column(String, nullable=True)
-
+    
     farmer = relationship("User", back_populates="products")
     orders = relationship("Order", back_populates="product")
     reviews = relationship("Review", back_populates="product")

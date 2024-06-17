@@ -19,7 +19,7 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(database.get_
     if product.available_quantity < order.quantity:
         raise HTTPException(status_code=400, detail="Not enough product available")
     total_price = order.quantity * product.price
-    db_order = models.Order(**order.dict(), buyer_id=current_user.id, total_price=total_price,timestamp=order.timestamp or datetime.utcnow())
+    db_order = models.Order(**order.dict(exclude={"timestamp"}), buyer_id=current_user.id, total_price=total_price,timestamp=order.timestamp or datetime.utcnow())
     product.available_quantity -= order.quantity
     db.add(db_order)
     db.commit()
